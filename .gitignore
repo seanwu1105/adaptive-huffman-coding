@@ -118,4 +118,4 @@ dmypy.json
 !.vscode/extensions.json
 
 # project
-temp.*
+temp*.*

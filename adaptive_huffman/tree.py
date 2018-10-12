@@ -1,8 +1,14 @@
-class Tree:
-    NYT = 'NYT'
+import collections
+import sys
 
-    def __init__(self, weight, num, data=None, nodes=None, root=False):
-        """ Use a set (`nodes`) to store all nodes in order to search the same
+from bitarray import bitarray
+
+NYT = 'NYT'
+
+
+class Tree:
+    def __init__(self, weight, num, data=None, nodes=None, is_root=False):
+        """Use a set (`nodes`) to store all nodes in order to search the same
         weight nodes (block) iteratively which would be faster than recursive
         traversal of a tree.
         """
@@ -13,12 +19,13 @@ class Tree:
         self.parent = None
         self.data = data
         self.nodes = nodes
-        if root:
+        if is_root:
             self.nodes.add(self)
-        self.code = list()
+        # will not be always updated
+        self._code = bitarray(endian=sys.byteorder)
 
     def __repr__(self):
-        return '#%d(%d)[%s]%s' % (self.num, self.weight, self.data, self.code)
+        return '#%d(%d)%s %s' % (self.num, self.weight, self.data, self._code)
 
     @property
     def left(self):
@@ -31,16 +38,18 @@ class Tree:
     @left.setter
     def left(self, left):
         self._left = left
-        self._left.parent = self
-        self.nodes.add(self._left)
-        self._left.nodes = self.nodes
+        if self._left:
+            self._left.parent = self
+            self.nodes.add(self._left)
+            self._left.nodes = self.nodes
 
     @right.setter
     def right(self, right):
         self._right = right
-        self._right.parent = self
-        self.nodes.add(self._right)
-        self._right.nodes = self.nodes
+        if self._right:
+            self._right.parent = self
+            self.nodes.add(self._right)
+            self._right.nodes = self.nodes
 
     def pretty(self, indent_str='  '):
         return ''.join(self._pretty(0, indent_str))
@@ -54,13 +63,46 @@ class Tree:
                 line += subtree._pretty(level + 1, indent_str)
         return line
 
-    def build_codes(self):
-        stack = [self]
+    def search(self, target):
+        """Search a specific data according within the tree. Return the code of
+        corresponding node if found. The code is the path from the root to the
+        target node. If not found in the tree, return the code of NYT node.
+
+        Args:
+            target (any): The target data which needs to be found.
+
+        Returns:
+            {'first_appearance': bool, 'code': bitarray}: An dictionary which
+                contain the information of searching result.
+        """
+
+        stack = collections.deque([self])
         while stack:
             current = stack.pop()
+            if current.data == target:
+                return {'first_appearance': False, 'code': current._code}
+            if current.data == NYT:
+                nyt_code = current._code
             if current.right:
-                current.right.code = [*current.code, 1]
+                current.right._code = current._code.copy()
+                current.right._code.append(1)
                 stack.append(current.right)
             if current.left:
-                current.left.code = [*current.code, 0]
+                current.left._code = current._code.copy()
+                current.left._code.append(0)
                 stack.append(current.left)
+        return {'first_appearance': True, 'code': nyt_code}
+
+
+def exchange(node1, node2):
+    """Exchange the children, parent, data of two nodes but keep the number and
+    weight the same. Note that this function will not change the reference of
+    `node1` and `node2`.
+    """
+
+    tmp_left, tmp_right = node1.left, node1.right
+    tmp_parent, tmp_data = node1.parent, node1.data
+    node1.left, node1.right = node2.left, node2.right
+    node1.parent, node1.data = node2.parent, node2.data
+    node2.left, node2.right = tmp_left, tmp_right
+    node2.parent, node2.data = tmp_parent, tmp_data
