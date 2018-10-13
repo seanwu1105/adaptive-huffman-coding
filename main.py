@@ -20,6 +20,8 @@ def main():
         code.tofile(out_raw)
     logging.getLogger(__name__).info('compressed: %d bytes' %
                                      os.path.getsize(out_filename))
+    
+    ada_huff.tree.search(-1) # only for debugging
     logging.getLogger(__name__).debug('tree:\n%s' % ada_huff.tree.pretty())
 
 

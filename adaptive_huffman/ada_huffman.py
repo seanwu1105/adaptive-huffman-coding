@@ -1,3 +1,4 @@
+import operator
 import sys
 
 from bitarray import bitarray
@@ -60,7 +61,7 @@ class AdaptiveHuffman:
                         filter(lambda n: n.data == symbol, self.all_nodes))
                 node_max_num_in_block = max(filter(
                     lambda n: n.weight == current_node.weight, self.all_nodes),
-                    key=lambda n: n.num)
+                    key=operator.attrgetter('num'))
                 if (current_node != node_max_num_in_block
                         and node_max_num_in_block != current_node.parent):
                     exchange(current_node, node_max_num_in_block)
@@ -70,4 +71,3 @@ class AdaptiveHuffman:
                 break
             current_node = current_node.parent
             first_appearance = False
-            self.tree.search(-1)  # TODO: only for testing
