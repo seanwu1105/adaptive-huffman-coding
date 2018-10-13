@@ -1,17 +1,9 @@
-import logging
 import sys
 
 from bitarray import bitarray
 import numpy as np
 
 from .tree import Tree, NYT, exchange
-
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    filename='debug.log',
-    filemode='w'
-)
 
 
 class AdaptiveHuffman:
@@ -37,9 +29,6 @@ class AdaptiveHuffman:
                 # code is path from root to the node
                 ret.extend(result['code'])
             self.update(symbol, result['first_appearance'])
-            logging.getLogger(__name__).debug(
-                'new symbol(%s) encoded: %s' % (symbol, ret))
-            logging.getLogger(__name__).debug('tree:\n%s' % self.tree.pretty())
         return ret
 
     def decode(self):
@@ -74,37 +63,11 @@ class AdaptiveHuffman:
                     key=lambda n: n.num)
                 if (current_node != node_max_num_in_block
                         and node_max_num_in_block != current_node.parent):
-                    logging.getLogger(__name__).debug(
-                        'switch required. curr_node: %s, max_node: %s' % (
-                            current_node, node_max_num_in_block))
-                    logging.getLogger(__name__).debug(
-                        'curr_node.parent: %s, max_node.left: %s, max_node.right: %s' % (
-                            current_node.parent, node_max_num_in_block.left, node_max_num_in_block.right))
-                    try:
-                        logging.getLogger(__name__).debug('#505.parent: %s' % next(
-                            filter(lambda n: n.num == 505, self.all_nodes)).parent)
-                    except:
-                        pass
-                    logging.getLogger(__name__).debug(
-                        '--- Before (total ln %s)\n%s' % (self.tree.pretty().count('\n'), self.tree.pretty()))
                     exchange(current_node, node_max_num_in_block)
-                    try:
-                        logging.getLogger(__name__).debug('#505.parent: %s' % next(
-                            filter(lambda n: n.num == 505, self.all_nodes)).parent)
-                    except:
-                        pass
-                    logging.getLogger(__name__).debug(
-                        '--- After (total ln %s)\n%s' % (self.tree.pretty().count('\n'), self.tree.pretty()))
                     current_node = node_max_num_in_block
                 current_node.weight += 1
             if not current_node.parent:
                 break
             current_node = current_node.parent
             first_appearance = False
-            try:
-                self.tree.search(-1)  # TODO: only for testing
-            except UnboundLocalError:
-                logging.getLogger(__name__).debug('--- error occurred ---')
-                logging.getLogger(__name__).debug('symbol: %s' % symbol)
-                logging.getLogger(__name__).debug(self.tree.pretty())
-                raise SystemExit
+            self.tree.search(-1)  # TODO: only for testing
