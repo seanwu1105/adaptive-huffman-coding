@@ -17,16 +17,13 @@ class AdaptiveHuffman:
         # `alphabet_size` leaves in a complete binary tree.
         self.current_node_num = alphabet_size * 2 - 1
 
-        self.all_nodes = list()
-        self.tree = Tree(
-            0, self.current_node_num,
-            data=NYT, nodes=self.all_nodes, is_root=True
-        )
+        self.tree = Tree(0, self.current_node_num, data=NYT)
+        self.all_nodes = [self.tree]
         self.nyt = self.tree  # initialize the NYT node tracker
 
     def encode(self):
         progressbar = Bar('encoding', max=len(self.byte_seq),
-                          suffix='%(index)d/%(max)d\t%(elapsed_td)ss')
+                          suffix='%(percent).1f%%\t%(elapsed_td)ss')
         ret = bitarray(endian=sys.byteorder)
         for symbol in self.byte_seq:
             result = self.tree.search(symbol)
@@ -49,12 +46,17 @@ class AdaptiveHuffman:
         while True:
             if first_appearance:
                 current_node = self.nyt
+
                 self.current_node_num -= 1
-                current_node.right = Tree(
-                    1, self.current_node_num, data=symbol)
+                external_node = Tree(1, self.current_node_num, data=symbol)
+                current_node.right = external_node
+                self.all_nodes.append(external_node)
+
                 self.current_node_num -= 1
-                current_node.left = Tree(
-                    0, self.current_node_num, data=NYT)
+                new_nyt = Tree(0, self.current_node_num, data=NYT)
+                current_node.left = new_nyt
+                self.all_nodes.append(new_nyt)
+
                 current_node.weight += 1
                 current_node.data = None
                 self.nyt = current_node.left
@@ -74,7 +76,6 @@ class AdaptiveHuffman:
                 break
             current_node = current_node.parent
             first_appearance = False
-            # self.tree.search(-1)  # TODO: only for testing
 
     def find_node_data(self, data):
         for node in self.all_nodes:

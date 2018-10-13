@@ -7,7 +7,7 @@ NYT = 'NYT'
 
 
 class Tree:
-    def __init__(self, weight, num, data=None, nodes=None, is_root=False):
+    def __init__(self, weight, num, data=None):
         """Use a set (`nodes`) to store all nodes in order to search the same
         weight nodes (block) iteratively which would be faster than recursive
         traversal of a tree.
@@ -18,13 +18,7 @@ class Tree:
         self._right = None
         self.parent = None
         self.data = data
-        self.nodes = nodes
-        if is_root:
-            if nodes is None:
-                raise ValueError(
-                    'nodes should be an empty list for root of the tree.')
-            self.nodes.append(self)
-        # will not be always updated
+        # code will not be always updated
         self._code = bitarray(endian=sys.byteorder)
 
     def __repr__(self):
@@ -43,16 +37,12 @@ class Tree:
         self._left = left
         if self._left:
             self._left.parent = self
-            self.nodes.append(self._left)
-            self._left.nodes = self.nodes
 
     @right.setter
     def right(self, right):
         self._right = right
         if self._right:
             self._right.parent = self
-            self.nodes.append(self._right)
-            self._right.nodes = self.nodes
 
     def pretty(self, indent_str='  '):
         return ''.join(self._pretty(0, indent_str))
