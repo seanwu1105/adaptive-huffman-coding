@@ -4,9 +4,9 @@ def main():
     with open('Lena.raw', 'rb') as in_raw:
         content = in_raw.read()
     ada_huff = AdaptiveHuffman(content, 256)
-    print(ada_huff.encode())
-    # with open('compressed.raw', 'wb') as raw:
-    #     ada_huff.encode().tofile(raw)
+    ada_huff.encode()
+    with open('compressed.raw', 'wb') as raw:
+        ada_huff.encode().tofile(raw)
 
 def show_raw_img(img, size=(512, 512)):
     from matplotlib import pyplot as plt
