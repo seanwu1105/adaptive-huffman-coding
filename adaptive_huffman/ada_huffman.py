@@ -18,7 +18,7 @@ class AdaptiveHuffman:
 
         self.tree = Tree(0, self.current_node_num, data=NYT)
         self.all_nodes = [self.tree]
-        self.nyt = self.tree # initialize the nyt reference
+        self.nyt = self.tree  # initialize the nyt reference
 
     def encode(self):
         ret = bitarray(endian=sys.byteorder)
@@ -57,10 +57,9 @@ class AdaptiveHuffman:
             else:
                 if not current_node:
                     # first time as `current_node` is None
-                    current_node = next(
-                        filter(lambda n: n.data == symbol, self.all_nodes))
-                node_max_num_in_block = max(filter(
-                    lambda n: n.weight == current_node.weight, self.all_nodes),
+                    current_node = self.find_node_data(symbol)
+                node_max_num_in_block = max(
+                    (n for n in self.all_nodes if n.weight == current_node.weight),
                     key=operator.attrgetter('num'))
                 if (current_node != node_max_num_in_block
                         and node_max_num_in_block != current_node.parent):
@@ -71,3 +70,9 @@ class AdaptiveHuffman:
                 break
             current_node = current_node.parent
             first_appearance = False
+
+    def find_node_data(self, data):
+        for node in self.all_nodes:
+            if node.data == data:
+                return node
+        raise KeyError('Cannot find the target node with given data %s' % data)
