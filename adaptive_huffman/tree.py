@@ -20,7 +20,7 @@ class Tree:
         self.data = data
         self.nodes = nodes
         if is_root:
-            if not nodes:
+            if nodes is None:
                 raise ValueError(
                     'nodes should be an empty set for root of the tree.')
             self.nodes.add(self)
@@ -103,9 +103,6 @@ def exchange(node1, node2):
     `node1` and `node2`.
     """
 
-    tmp_left, tmp_right = node1.left, node1.right
-    tmp_parent, tmp_data = node1.parent, node1.data
-    node1.left, node1.right = node2.left, node2.right
-    node1.parent, node1.data = node2.parent, node2.data
-    node2.left, node2.right = tmp_left, tmp_right
-    node2.parent, node2.data = tmp_parent, tmp_data
+    tmp_left, tmp_right, tmp_data = node1.left, node1.right, node1.data
+    node1.left, node1.right, node1.data = node2.left, node2.right, node2.data
+    node2.left, node2.right, node2.data = tmp_left, tmp_right, tmp_data

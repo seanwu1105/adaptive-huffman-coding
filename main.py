@@ -1,10 +1,11 @@
 from adaptive_huffman.ada_huffman import AdaptiveHuffman
 
 def main():
-    with open('Lena.raw', 'rb') as in_raw:
+    with open('temp.raw', 'rb') as in_raw:
         content = in_raw.read()
     ada_huff = AdaptiveHuffman(content, 256)
     print(ada_huff.encode())
+    print(ada_huff.tree.pretty())
     # with open('compressed.raw', 'wb') as raw:
     #     ada_huff.encode().tofile(raw)
 
