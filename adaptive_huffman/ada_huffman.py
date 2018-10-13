@@ -23,19 +23,8 @@ class AdaptiveHuffman:
         # `alphabet_size` leaves in a complete binary tree.
         self.current_node_num = alphabet_size * 2 - 1
 
-        self.all_nodes = set()
-        self.tree = Tree(
-            0, self.current_node_num,
-            data=NYT, nodes=self.all_nodes, is_root=True
-        )
-        # self.tree.left = Tree(0, 1, data='a')
-        # self.tree.left.left = Tree(0, 1, data='b')
-        # self.tree.left.right = Tree(0, 1, data='c')
-        # self.tree.right = Tree(0, 1, data='d')
-        # self.tree.right.left = Tree(0, 1, data='e')
-        # self.tree.right.right = Tree(0, 1, data='f')
-        # print(self.tree.search('f'))
-        # print(self.tree.pretty())
+        self.tree = Tree(0, self.current_node_num, data=NYT)
+        self.all_nodes = [self.tree]
 
     def encode(self):
         ret = bitarray(endian=sys.byteorder)
@@ -62,12 +51,17 @@ class AdaptiveHuffman:
             if first_appearance:
                 current_node = next(
                     filter(lambda n: n.data == NYT, self.all_nodes))
+
                 self.current_node_num -= 1
-                current_node.right = Tree(
-                    1, self.current_node_num, data=symbol)
+                new_external = Tree(1, self.current_node_num, data=symbol)
+                current_node.right = new_external
+                self.all_nodes.append(new_external)
+
                 self.current_node_num -= 1
-                current_node.left = Tree(
-                    0, self.current_node_num, data=NYT)
+                new_nyt = Tree(0, self.current_node_num, data=NYT)
+                current_node.left = new_nyt
+                self.all_nodes.append(new_nyt)
+
                 current_node.weight += 1
                 current_node.data = None
             else:
