@@ -20,6 +20,9 @@ class Tree:
         self.data = data
         self.nodes = nodes
         if is_root:
+            if not nodes:
+                raise ValueError(
+                    'nodes should be an empty set for root of the tree.')
             self.nodes.add(self)
         # will not be always updated
         self._code = bitarray(endian=sys.byteorder)
