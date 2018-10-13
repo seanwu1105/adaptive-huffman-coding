@@ -2,6 +2,7 @@ import operator
 import sys
 
 from bitarray import bitarray
+from progress.bar import ShadyBar
 import numpy as np
 
 from .tree import Tree, NYT, exchange
@@ -18,19 +19,23 @@ class AdaptiveHuffman:
 
         self.tree = Tree(0, self.current_node_num, data=NYT)
         self.all_nodes = [self.tree]
-        self.nyt = self.tree  # initialize the nyt reference
+        self.nyt = self.tree  # initialize the NYT reference
 
     def encode(self):
+        progressbar = ShadyBar('encoding', max=len(self.byte_seq),
+        suffix='%(percent).1f%% - %(elapsed_td)ss')
         ret = bitarray(endian=sys.byteorder)
         for symbol in self.byte_seq:
             result = self.tree.search(symbol)
             if result['first_appearance']:
-                ret.extend(result['code'])
-                ret.frombytes(bytes([symbol]))
+                ret.extend(result['code']) # send code of NYT
+                ret.frombytes(bytes([symbol])) # send fixed code of symbol
             else:
                 # code is path from root to the node
                 ret.extend(result['code'])
             self.update(symbol, result['first_appearance'])
+            progressbar.next()
+        progressbar.finish()
         return ret
 
     def decode(self):

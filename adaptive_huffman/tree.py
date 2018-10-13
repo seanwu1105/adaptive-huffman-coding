@@ -88,7 +88,7 @@ class Tree:
 
 
 def exchange(node1, node2):
-    """Exchange the children, parent, data of two nodes but keep the number and
+    """Exchange the children, data of two nodes but keep the number, parent and
     weight the same. Note that this function will not change the reference of
     `node1` and `node2`.
     """
