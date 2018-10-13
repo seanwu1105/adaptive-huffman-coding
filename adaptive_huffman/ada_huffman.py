@@ -17,6 +17,7 @@ class AdaptiveHuffman:
 
         self.tree = Tree(0, self.current_node_num, data=NYT)
         self.all_nodes = [self.tree]
+        self.nyt = self.tree # initialize the nyt reference
 
     def encode(self):
         ret = bitarray(endian=sys.byteorder)
@@ -38,8 +39,7 @@ class AdaptiveHuffman:
         current_node = None
         while True:
             if first_appearance:
-                current_node = next(
-                    filter(lambda n: n.data == NYT, self.all_nodes))
+                current_node = self.nyt
 
                 self.current_node_num -= 1
                 new_external = Tree(1, self.current_node_num, data=symbol)
@@ -47,9 +47,9 @@ class AdaptiveHuffman:
                 self.all_nodes.append(new_external)
 
                 self.current_node_num -= 1
-                new_nyt = Tree(0, self.current_node_num, data=NYT)
-                current_node.left = new_nyt
-                self.all_nodes.append(new_nyt)
+                self.nyt = Tree(0, self.current_node_num, data=NYT)
+                current_node.left = self.nyt
+                self.all_nodes.append(self.nyt)
 
                 current_node.weight += 1
                 current_node.data = None
