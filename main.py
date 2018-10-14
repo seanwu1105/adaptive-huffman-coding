@@ -8,18 +8,17 @@ logging.basicConfig(level=logging.INFO)
 
 
 def main():
-    compress('Baboon.raw', 'compressed', alphabet_size=(0, 255))
-    extract('compressed', 'extract.raw', alphabet_size=(0, 255))
-    # extract('compressed baboon', 'extract.raw', alphabet_size=(0, 255))
-    # show_raw_img('extract.raw', size=(512, 512))
+    compress('Lena.raw', 'compressed', alphabet_range=(0, 255))
+    extract('compressed', 'extract.raw', alphabet_range=(0, 255))
+    show_raw_img('extract.raw', size=(512, 512))
 
 
-def compress(in_filename, out_filename, alphabet_size):
+def compress(in_filename, out_filename, alphabet_range):
     with open(in_filename, 'rb') as in_file:
-        content = in_file.read()[:5000]
+        content = in_file.read()
         logging.getLogger(__name__).info('original size: %d bytes' %
                                          os.path.getsize(in_file.name))
-    ada_huff = AdaptiveHuffman(content, alphabet_size)
+    ada_huff = AdaptiveHuffman(content, alphabet_range)
     code = ada_huff.encode()
 
     with open(out_filename, 'wb') as out_file:
@@ -28,12 +27,12 @@ def compress(in_filename, out_filename, alphabet_size):
                                      os.path.getsize(out_filename))
 
 
-def extract(in_filename, out_filename, alphabet_size):
+def extract(in_filename, out_filename, alphabet_range):
     with open(in_filename, 'rb') as in_file:
         content = in_file.read()
         logging.getLogger(__name__).info('original size: %d bytes' %
                                          os.path.getsize(in_file.name))
-    ada_huff = AdaptiveHuffman(content, alphabet_size)
+    ada_huff = AdaptiveHuffman(content, alphabet_range)
     code = ada_huff.decode()
 
     with open(out_filename, 'wb') as out_file:
