@@ -16,7 +16,7 @@ def main():
 
 def compress(in_filename, out_filename, alphabet_size):
     with open(in_filename, 'rb') as in_file:
-        content = in_file.read()[:10000]
+        content = in_file.read()[:5000]
         logging.getLogger(__name__).info('original size: %d bytes' %
                                          os.path.getsize(in_file.name))
     ada_huff = AdaptiveHuffman(content, alphabet_size)
