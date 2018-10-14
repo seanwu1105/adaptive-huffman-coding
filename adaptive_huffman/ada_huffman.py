@@ -77,6 +77,7 @@ class AdaptiveHuffman:
 
         bit_seq = bitarray(endian=sys.byteorder)
         bit_seq.frombytes(self.byte_seq)
+        
         progressbar = ShadyBar('encoding', max=bit_seq.length(),
                                suffix='%(percent).1f%% - %(eta_td)ss - %(elapsed_td)ss')
 
