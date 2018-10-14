@@ -8,27 +8,46 @@ logging.basicConfig(level=logging.INFO)
 
 
 def main():
-    with open('Baboon.raw', 'rb') as in_raw:
-        content = in_raw.read()
-        logging.getLogger(__name__).info('original size: %d bytes' %
-                                         os.path.getsize(in_raw.name))
-    ada_huff = AdaptiveHuffman(content, (0, 255))
-    code = ada_huff.encode()
+    compress('temp.raw', 'compressed', alphabet_size=(0, 255))
+    extract('compressed', 'extract.raw', alphabet_size=(0, 255))
+    # show_raw_img('extract.raw', size=(512, 512))
 
-    out_filename = 'compressed.raw'
-    with open(out_filename, 'wb') as out_raw:
-        code.tofile(out_raw)
+
+def compress(in_filename, out_filename, alphabet_size):
+    with open(in_filename, 'rb') as in_file:
+        content = in_file.read()
+        logging.getLogger(__name__).info('original size: %d bytes' %
+                                         os.path.getsize(in_file.name))
+    ada_huff = AdaptiveHuffman(content, alphabet_size)
+    code = ada_huff.encode()
+    print(len(code))
+
+    with open(out_filename, 'wb') as out_file:
+        code.tofile(out_file)
     logging.getLogger(__name__).info('compressed size: %d bytes' %
                                      os.path.getsize(out_filename))
-    
-    # XXX: decoder should be a new AdaptiveHuffman() object!
-
-    ada_huff.tree.search(-1) # only for debugging
-    logging.getLogger(__name__).debug('tree:\n%s' % ada_huff.tree.pretty())
 
 
-def show_raw_img(img, size=(512, 512)):
+def extract(in_filename, out_filename, alphabet_size):
+    with open(in_filename, 'rb') as in_file:
+        content = in_file.read()
+        logging.getLogger(__name__).info('original size: %d bytes' %
+                                         os.path.getsize(in_file.name))
+    ada_huff = AdaptiveHuffman(content, alphabet_size)
+    code = ada_huff.decode()
+
+    with open(out_filename, 'wb') as out_file:
+        out_file.write(bytearray(code))
+    logging.getLogger(__name__).info('extract size: %d bytes' %
+                                     os.path.getsize(out_filename))
+
+
+def show_raw_img(img_filename, size):
     from matplotlib import pyplot as plt
+    import numpy as np
+
+    with open(img_filename, 'rb') as img_file:
+        img = np.fromfile(img_file, dtype=np.uint8)
     img.shape = size
     plt.imshow(img, cmap='gray')
     plt.show()
