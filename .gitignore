@@ -119,4 +119,4 @@ dmypy.json
 
 # project
 temp*.*
-compressed*.*
+compressed*

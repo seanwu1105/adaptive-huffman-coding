@@ -22,7 +22,7 @@ class Tree:
         self._code = bitarray(endian=sys.byteorder)
 
     def __repr__(self):
-        return '#%d(%d)%s %s' % (self.num, self.weight, self.data, self._code)
+        return "#%d(%d)%s '%s'" % (self.num, self.weight, self.data, self._code.to01())
 
     @property
     def left(self):
@@ -75,7 +75,7 @@ class Tree:
             if current.data == target:
                 return {'first_appearance': False, 'code': current._code}
             if current.data == NYT:
-                nyt_code = current._code
+                nytcode = current._code
             if current.right:
                 current.right._code = current._code.copy()
                 current.right._code.append(1)
@@ -84,7 +84,7 @@ class Tree:
                 current.left._code = current._code.copy()
                 current.left._code.append(0)
                 stack.append(current.left)
-        return {'first_appearance': True, 'code': nyt_code}
+        return {'first_appearance': True, 'code': nytcode}
 
 
 def exchange(node1, node2):
