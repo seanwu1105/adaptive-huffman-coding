@@ -4,7 +4,6 @@ import logging
 from adaptive_huffman.ada_huffman import AdaptiveHuffman
 
 
-<<<<<<< HEAD
 logging.basicConfig(level=logging.INFO)
 
 
@@ -26,28 +25,6 @@ def main():
 
     ada_huff.tree.search(-1) # only for debugging
     logging.getLogger(__name__).debug('tree:\n%s' % ada_huff.tree.pretty())
-=======
-logging.basicConfig(
-    level=logging.INFO
-)
-
-
-def main():
-    with open('temp.raw', 'rb') as in_raw:
-        content = in_raw.read()[:]
-        print(len(content))
-        logging.getLogger(__name__).info('original: %d bytes' %
-                                         os.path.getsize(in_raw.name))
-    ada_huff = AdaptiveHuffman(content, 256)
-    code = ada_huff.encode()
-    ada_huff.tree.search(-1)
-    print(ada_huff.tree.pretty())
-    outfilename = 'compressed.raw'
-    with open(outfilename, 'wb') as raw:
-        code.tofile(raw)
-    logging.getLogger(__name__).info('compressed: %d bytes' %
-                                     os.path.getsize(outfilename))
->>>>>>> master
 
 
 def show_raw_img(img, size=(512, 512)):
