@@ -8,19 +8,19 @@ logging.basicConfig(level=logging.INFO)
 
 
 def main():
-    compress('temp.raw', 'compressed', alphabet_size=(0, 255))
+    compress('Baboon.raw', 'compressed', alphabet_size=(0, 255))
     extract('compressed', 'extract.raw', alphabet_size=(0, 255))
+    # extract('compressed baboon', 'extract.raw', alphabet_size=(0, 255))
     # show_raw_img('extract.raw', size=(512, 512))
 
 
 def compress(in_filename, out_filename, alphabet_size):
     with open(in_filename, 'rb') as in_file:
-        content = in_file.read()
+        content = in_file.read()[:10000]
         logging.getLogger(__name__).info('original size: %d bytes' %
                                          os.path.getsize(in_file.name))
     ada_huff = AdaptiveHuffman(content, alphabet_size)
     code = ada_huff.encode()
-    print(len(code))
 
     with open(out_filename, 'wb') as out_file:
         code.tofile(out_file)
