@@ -1,0 +1,4 @@
+bitarray>=0.8.3
+numpy>=1.15.0
+matplotlib>=2.2.3
+progress>=1.4
