@@ -1,3 +1,6 @@
+import collections
+import itertools
+import math
 import operator
 import sys
 
@@ -9,7 +12,7 @@ from .tree import Tree, NYT, exchange
 
 
 class AdaptiveHuffman:
-    def __init__(self, byte_seq, alphabet_range=(0, 255)):
+    def __init__(self, byte_seq, alphabet_range=(0, 255), dpcm=False):
         """Create an adaptive huffman encoder and decoder.
 
         Args:
@@ -19,6 +22,8 @@ class AdaptiveHuffman:
         """
 
         self.byte_seq = byte_seq
+        self.dpcm = dpcm
+
         # Get the first decimal number of all alphabets
         self.alphabet_first_num = min(alphabet_range)
         alphabet_size = abs(alphabet_range[0] - alphabet_range[1]) + 1
@@ -53,8 +58,16 @@ class AdaptiveHuffman:
             ret.frombytes(int2bytes(alphabet_idx - self.rem - 1))
             return ret[:self.exp] if sys.byteorder == 'little' else ret[-(self.exp):]
 
+        def convert_to_dpcm(seq):
+            seq = list(seq)
+            return ((item - seq[idx - 1]) & 0xff if idx else seq[idx] for idx, item in enumerate(seq))
+
         progressbar = ShadyBar('encoding', max=len(self.byte_seq),
                                suffix='%(percent).1f%% - %(elapsed_td)ss')
+
+        if self.dpcm:
+            self.byte_seq = convert_to_dpcm(self.byte_seq)
+
         code = bitarray(endian=sys.byteorder)
         for symbol in self.byte_seq:
             fixed_code = to_fixed_code(symbol)
@@ -72,14 +85,10 @@ class AdaptiveHuffman:
         # to avoid the decoder regarding the remaining bits as actual data. The
         # remaining bits length info require 3 bits to store the length. Note
         # that the first 3 bits are stored as big endian binary string.
-        # XXX: There might has a better way to replace this implement.
         remaining_bits_length = (bits2bytes(
             code.length() + 3) * 8 - (code.length() + 3))
         for bit in '{:03b}'.format(remaining_bits_length)[::-1]:
-            if bit == '0':
-                code.insert(0, False)
-            else:
-                code.insert(0, True)
+            code.insert(0, False if bit == '0' else True)
 
         progressbar.finish()
         return code
@@ -92,6 +101,9 @@ class AdaptiveHuffman:
             list: A list of integer representing the number of decoded byte
                 sequence.
         """
+
+        def convert_from_dpcm(seq):
+            return itertools.accumulate(seq, lambda x, y: (x + y) & 0xff)
 
         def read_bit(n):
             """For decoder, get the first n bits in `bit_seq` and move
@@ -112,7 +124,6 @@ class AdaptiveHuffman:
         # bitarray.tofile() to fill up to complete byte size (8 bits). The
         # remaining bits length could be retrieved by reading the first 3 bits.
         # Note that the first 3 bits are stored as big endian binary string.
-        # XXX: There might has a better way to replace this implement.
         remaining_bits_length = int(read_bit(3).to01(), 2)
         del bit_seq[-remaining_bits_length:]
         progressbar.next(remaining_bits_length)
@@ -142,7 +153,7 @@ class AdaptiveHuffman:
                 code.append(current_node.data)
             self.update(dec, first_appearance)
         progressbar.finish()
-        return code
+        return convert_from_dpcm(code) if self.dpcm else code
 
     def update(self, data, first_appearance):
 
@@ -187,6 +198,17 @@ class AdaptiveHuffman:
                 break
             current_node = current_node.parent
             first_appearance = False
+
+
+def entropy(byte_seq):
+    counter = collections.Counter()
+    for byte in byte_seq:
+        counter[byte] += 1
+    ret = 0
+    for count in counter.values():
+        prob = count / len(byte_seq)
+        ret += prob * math.log2(prob)
+    return -ret
 
 
 def int2bytes(x):
