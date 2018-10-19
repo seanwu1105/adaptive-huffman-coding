@@ -1,0 +1,14 @@
+image: python:3.6
+
+before_script:
+  - python3 -m pip install -r requirements.txt
+
+features:
+  script:
+    - python3 -m pip install nose2
+    - nose2 -v --with-coverage --log-capture
+
+pylint:
+  script:
+    - python3 -m pip install pylint
+    - pylint --errors-only *.py */**.py

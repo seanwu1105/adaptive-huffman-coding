@@ -1,7 +1,9 @@
 import collections
 import itertools
+import logging
 import math
 import operator
+import os
 import sys
 
 from bitarray import bitarray, bits2bytes
@@ -66,7 +68,10 @@ class AdaptiveHuffman:
                                suffix='%(percent).1f%% - %(elapsed_td)ss')
 
         if self.dpcm:
-            self.byte_seq = convert_to_dpcm(self.byte_seq)
+            self.byte_seq = tuple(convert_to_dpcm(self.byte_seq))
+
+        logging.getLogger(__name__).info('entropy: %f' %
+                                         entropy(self.byte_seq))
 
         code = bitarray(endian=sys.byteorder)
         for symbol in self.byte_seq:
@@ -201,12 +206,10 @@ class AdaptiveHuffman:
 
 
 def entropy(byte_seq):
-    counter = collections.Counter()
-    for byte in byte_seq:
-        counter[byte] += 1
+    counter = collections.Counter(byte_seq)
     ret = 0
     for count in counter.values():
-        prob = count / len(byte_seq)
+        prob = count / sum(counter.values())
         ret += prob * math.log2(prob)
     return -ret
 
@@ -216,3 +219,35 @@ def int2bytes(x):
     if x == 0:
         return b'\x00'
     return x.to_bytes((x.bit_length() + 7) // 8, sys.byteorder)
+
+
+def compress(in_filename, out_filename, alphabet_range, dpcm):
+    with open(in_filename, 'rb') as in_file:
+        logging.getLogger(__name__).info('open file: "%s"' % in_filename)
+        content = in_file.read()
+        logging.getLogger(__name__).info('original size: %d bytes' %
+                                         os.path.getsize(in_file.name))
+    ada_huff = AdaptiveHuffman(content, alphabet_range, dpcm)
+    code = ada_huff.encode()
+
+    with open(out_filename, 'wb') as out_file:
+        logging.getLogger(__name__).info('write file: "%s"' % out_filename)
+        code.tofile(out_file)
+    logging.getLogger(__name__).info('compressed size: %d bytes' %
+                                     os.path.getsize(out_filename))
+
+
+def extract(in_filename, out_filename, alphabet_range, dpcm):
+    with open(in_filename, 'rb') as in_file:
+        logging.getLogger(__name__).info('open file: "%s"' % in_filename)
+        content = in_file.read()
+        logging.getLogger(__name__).info('original size: %d bytes' %
+                                         os.path.getsize(in_file.name))
+    ada_huff = AdaptiveHuffman(content, alphabet_range, dpcm)
+    code = ada_huff.decode()
+
+    with open(out_filename, 'wb') as out_file:
+        logging.getLogger(__name__).info('write file: "%s"' % out_filename)
+        out_file.write(bytes(code))
+    logging.getLogger(__name__).info('extract size: %d bytes' %
+                                     os.path.getsize(out_filename))
