@@ -73,9 +73,9 @@ pip3 install progress
 
 ## Algorithm and Implementation
 
-### Encode Procedure
+### Encoding Procedure
 
-Assume the input stream is an sequence of byte. First, if we use DPCM as symbol set, we use the following method for differentiation.
+Assume the input stream is a sequence of bytes. First, if we use DPCM as symbol set, we use the following method for differentiation.
 
 ``` python
 # `seq` is byte array originally. For indexing, we need to convert it into list.
@@ -83,7 +83,7 @@ seq = list(seq)
 return ((item - seq[idx - 1]) & 0xff if idx else seq[idx] for idx, item in enumerate(seq))
 ```
 
-Second, we convert every byte in the sequence into fixed code by the following method:
+Second, we convert every byte in the sequence into a fixed code by the following method:
 
 Assume the source has an alphabet (`a[1]`, `a[2]`, ..., `a[m]`) of size `m`, then pick `e` and `r` such that `m = 2^e + r` and `0 <= r < 2^e`. We calculate `e` and `r` by the following Python codes.
 
@@ -93,13 +93,11 @@ e = m.bit_length() - 1
 r = m - 2**e
 ```
 
-Let `k` to be the index of a certain alphabet. If `1 <= k <= 2r`, the symbol `a[k]` is encoded as the `(e + 1)`-bit binary representation of `k - 1`. Else, `a[k]` is encoded as `e`-bit representaton of `k - r - 1`.
-
-After converting byte symbols into fixed codes, we encode the whole sequence into bit sequence by the following flowchart.
+Let `k` to be the index of a certain alphabet. If `1 <= k <= 2r`, the symbol `a[k]` is encoded as the `(e + 1)`-bit binary representation of `k - 1`. Else, `a[k]` is encoded as `e`-bit representation of `k - r - 1`. After converting byte symbols into fixed codes, we encode the whole sequence into bit sequence by the following flowchart.
 
 ![Encoding Flowchart](https://i.imgur.com/5xzPKiO.png "Encoding Flowchart")
 
-Finally, as the length of the bit sequence might not be a multiple of 8, the few remaining bits (1..7) are set to 0. We need to **add the length of remaining bits we filled to the head of output bit sequence** in order to notify the exact file size for decoding procedure. To implement this, we could simply insert 3-bit at the beginning of output bit sequence to represent the length of fill-up remaining bits.
+Finally, as the length of the bit sequence might not be a multiple of 8, the few remaining bits (1..7) are set to 0. We need to **add the length of remaining bits we filled to the head of output bit sequence** in order to notify the exact file size for decoding procedure. To implement this, we could simply insert 3-bit at the beginning of the output bit sequence to represent the length of fill-up remaining bits.
 
 ``` python
 # Get the length of remaining bits.
@@ -109,9 +107,9 @@ for bit in '{:03b}'.format(remaining_bits_length)[::-1]:
     code.insert(0, False if bit == '0' else True)
 ```
 
-### Decode Procedure
+### Decoding Procedure
 
-First, we need to get the actual file size from the first 3-bit of the input bit sequence and remove them as well as the fill-up remaining bits appending to the last of sequence.
+First, we need to get the actual file size from the first 3-bit of the input bit sequence and remove them as well as the fill-up remaining bits appending to the sequence.
 
 ``` python
 # Get the actual file size and remove the information.
@@ -131,9 +129,9 @@ Finally, if the file is encoded with DPCM, we need to convert the content back i
 return itertools.accumulate(seq, lambda x, y: (x + y) & 0xff)
 ```
 
-### Update Procedure
+### Updating Procedure
 
-The update procedure used by both encoding and decoding procedure is the following flowchart.
+The updating procedure used by both encoding and decoding procedure is the following flowchart.
 
 ![Update Flowchart](https://i.imgur.com/hmCA8jT.png "Update Flowchart")
 
