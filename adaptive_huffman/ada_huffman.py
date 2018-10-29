@@ -27,7 +27,7 @@ class AdaptiveHuffman:
         self.dpcm = dpcm
 
         # Get the first decimal number of all alphabets
-        self.alphabet_first_num = min(alphabet_range)
+        self._alphabet_first_num = min(alphabet_range)
         alphabet_size = abs(alphabet_range[0] - alphabet_range[1]) + 1
         # Select an `exp` and `rem` which meet `alphabet_size = 2**exp + rem`.
         # Get the largest `exp` smaller than `alphabet_size`.
@@ -52,7 +52,7 @@ class AdaptiveHuffman:
         """
 
         def to_fixed_code(dec):
-            alphabet_idx = dec - (self.alphabet_first_num - 1)
+            alphabet_idx = dec - (self._alphabet_first_num - 1)
             ret = bitarray(endian=sys.byteorder)
             if alphabet_idx <= 2 * self.rem:
                 ret.frombytes(int2bytes(alphabet_idx - 1))
@@ -60,7 +60,7 @@ class AdaptiveHuffman:
             ret.frombytes(int2bytes(alphabet_idx - self.rem - 1))
             return ret[:self.exp] if sys.byteorder == 'little' else ret[-(self.exp):]
 
-        def convert_to_dpcm(seq):
+        def to_dpcm(seq):
             seq = list(seq)
             return ((item - seq[idx - 1]) & 0xff if idx else seq[idx] for idx, item in enumerate(seq))
 
@@ -68,7 +68,7 @@ class AdaptiveHuffman:
                                suffix='%(percent).1f%% - %(elapsed_td)ss')
 
         if self.dpcm:
-            self.byte_seq = tuple(convert_to_dpcm(self.byte_seq))
+            self.byte_seq = tuple(to_dpcm(self.byte_seq))
 
         logging.getLogger(__name__).info('entropy: %f' %
                                          entropy(self.byte_seq))
@@ -107,7 +107,7 @@ class AdaptiveHuffman:
                 sequence.
         """
 
-        def convert_from_dpcm(seq):
+        def from_dpcm(seq):
             return itertools.accumulate(seq, lambda x, y: (x + y) & 0xff)
 
         def read_bit(n):
@@ -149,7 +149,7 @@ class AdaptiveHuffman:
                     dec = ord(bits.tobytes())
                 else:
                     dec += self.rem
-                dec += 1 + (self.alphabet_first_num - 1)
+                dec += 1 + (self._alphabet_first_num - 1)
                 code.append(dec)
             else:
                 # decode element corresponding to node
@@ -158,7 +158,7 @@ class AdaptiveHuffman:
                 code.append(current_node.data)
             self.update(dec, first_appearance)
         progressbar.finish()
-        return convert_from_dpcm(code) if self.dpcm else code
+        return from_dpcm(code) if self.dpcm else code
 
     def update(self, data, first_appearance):
 
