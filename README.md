@@ -1,5 +1,7 @@
 # Adaptive Huffman Coding Compression
 
+Adaptive Huffman coding algorithm in Python.
+
 ## Testing Files and Compressing Results
 
 |                                         File Name                                         |  Compressed  | Compressing/Extracting Time | First-Order Entropy | Compressed File Size (DPCM) | Compressing/Extracting Time (DPCM) | First-Order Entropy (DPCM) |
