@@ -1,5 +1,9 @@
 # Adaptive Huffman Coding Compression
 
+[![pipeline status](https://gitlab.com/GLaDOS1105/adaptive-huffman-coding/badges/master/pipeline.svg)](https://gitlab.com/GLaDOS1105/adaptive-huffman-coding/commits/master)
+[![coverage report](https://gitlab.com/GLaDOS1105/adaptive-huffman-coding/badges/master/coverage.svg)](https://gitlab.com/GLaDOS1105/adaptive-huffman-coding/commits/master)
+[![Requirements Status](https://requires.io/github/GLaDOS1105/adaptive-huffman-coding/requirements.svg?branch=master)](https://requires.io/github/GLaDOS1105/adaptive-huffman-coding/requirements/?branch=master)
+
 Adaptive Huffman coding algorithm in Python.
 
 ## Testing Files and Compressing Results
