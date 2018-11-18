@@ -3,7 +3,7 @@ import os
 import logging
 import unittest
 
-from adaptive_huffman.ada_huffman import compress, extract
+from adaptive_huffman import compress, extract
 
 
 logging.basicConfig(level=logging.DEBUG)
