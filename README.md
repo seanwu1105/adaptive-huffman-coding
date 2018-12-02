@@ -51,7 +51,12 @@ nose2 -v --with-coverage --log-capture
 
 > This requires **nose2** package (`pip3 install nose2`).
 
-### Dependencies
+## Caveat
+
+* This algorithm will read **ALL** image into memory and **ALL** encoded bits would be saved as **Python String**, and thus it is possible to cause memory overflow if the input image file is too large.
+* [Details Report](https://is.gd/VMCLWw)
+
+## Dependencies
 
 * [bitarray](https://github.com/ilanschnell/bitarray)
 
