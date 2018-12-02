@@ -89,6 +89,6 @@ def exchange(node1, node2):
     `node1` and `node2`.
     """
 
-    tmp_left, tmp_right, tmp_data = node1.left, node1.right, node1.data
-    node1.left, node1.right, node1.data = node2.left, node2.right, node2.data
-    node2.left, node2.right, node2.data = tmp_left, tmp_right, tmp_data
+    node1.left, node2.left = node2.left, node1.left
+    node1.right, node2.right = node2.right, node1.right
+    node1.data, node2.data = node2.data, node1.data
