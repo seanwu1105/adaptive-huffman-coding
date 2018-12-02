@@ -11,6 +11,7 @@ from progress.bar import ShadyBar
 import numpy as np
 
 from .tree import Tree, NYT, exchange
+from .utils import encode_dpcm
 
 
 class AdaptiveHuffman:
@@ -52,28 +53,42 @@ class AdaptiveHuffman:
         """
 
         def to_fixed_code(dec):
+            """Convert a decimal number into specified fixed code.
+
+            Arguments:
+                dec {int} -- The alphabet need to be converted into fixed code.
+
+            Returns:
+                list of bool -- Fixed codes.
+            """
+
             alphabet_idx = dec - (self._alphabet_first_num - 1)
-            ret = bitarray(endian=sys.byteorder)
             if alphabet_idx <= 2 * self.rem:
-                ret.frombytes(int2bytes(alphabet_idx - 1))
-                return ret[:self.exp + 1] if sys.byteorder == 'little' else ret[-(self.exp + 1):]
-            ret.frombytes(int2bytes(alphabet_idx - self.rem - 1))
-            return ret[:self.exp] if sys.byteorder == 'little' else ret[-(self.exp):]
+                fixed_str = '{:0{padding}b}'.format(
+                    alphabet_idx - 1,
+                    padding=self.exp + 1
+                )
+            else:
+                fixed_str = '{:0{padding}b}'.format(
+                    alphabet_idx - self.rem - 1,
+                    padding=self.exp
+                )
+            return [False if c == '0' else True for c in fixed_str]
 
-        def to_dpcm(seq):
-            seq = list(seq)
-            return ((item - seq[idx - 1]) & 0xff if idx else seq[idx] for idx, item in enumerate(seq))
-
-        progressbar = ShadyBar('encoding', max=len(self.byte_seq),
-                               suffix='%(percent).1f%% - %(elapsed_td)ss')
+        progressbar = ShadyBar(
+            'encoding',
+            max=len(self.byte_seq),
+            suffix='%(percent).1f%% - %(elapsed_td)ss'
+        )
 
         if self.dpcm:
-            self.byte_seq = tuple(to_dpcm(self.byte_seq))
+            self.byte_seq = tuple(encode_dpcm(self.byte_seq))
 
-        logging.getLogger(__name__).info('entropy: %f' %
-                                         entropy(self.byte_seq))
+        logging.getLogger(__name__).info(
+            'entropy: %f' % entropy(self.byte_seq)
+        )
 
-        code = bitarray(endian=sys.byteorder)
+        code = []
         for symbol in self.byte_seq:
             fixed_code = to_fixed_code(symbol)
             result = self.tree.search(fixed_code)

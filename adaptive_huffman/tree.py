@@ -1,8 +1,6 @@
 import collections
 import sys
 
-from bitarray import bitarray
-
 NYT = 'NYT'
 
 
@@ -19,10 +17,10 @@ class Tree:
         self.parent = None
         self.data = data
         # code will not be always updated
-        self._code = bitarray(endian=sys.byteorder)
+        self._code = []
 
     def __repr__(self):
-        return "#%d(%d)%s '%s'" % (self.num, self.weight, self.data, self._code.to01())
+        return "#%d(%d)%s '%s'" % (self.num, self.weight, self.data, self._code)
 
     @property
     def left(self):
@@ -65,7 +63,7 @@ class Tree:
             target (any): The target data which needs to be found.
 
         Returns:
-            {'first_appearance': bool, 'code': bitarray}: An dictionary which
+            {'first_appearance': bool, 'code': str}: An dictionary which
                 contain the information of searching result.
         """
 
@@ -77,12 +75,10 @@ class Tree:
             if current.data == NYT:
                 nytcode = current._code
             if current.right:
-                current.right._code = current._code.copy()
-                current.right._code.append(1)
+                current.right._code = current._code + [1]
                 stack.append(current.right)
             if current.left:
-                current.left._code = current._code.copy()
-                current.left._code.append(0)
+                current.left._code = current._code + [0]
                 stack.append(current.left)
         return {'first_appearance': True, 'code': nytcode}
 
