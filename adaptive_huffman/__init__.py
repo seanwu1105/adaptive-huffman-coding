@@ -40,6 +40,7 @@ class AdaptiveHuffman:
         self.all_nodes = [self.tree]
         self.nyt = self.tree  # initialize the NYT reference
 
+    @profile
     def encode(self):
         """Encode the target byte sequence into compressed bit sequence by
         adaptive Huffman coding.
@@ -111,6 +112,7 @@ class AdaptiveHuffman:
         progressbar.finish()
         return bitarray(code)
 
+    @profile
     def decode(self):
         """Decode the target byte sequence which is encoded by adaptive Huffman
         coding.

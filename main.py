@@ -6,7 +6,6 @@ from adaptive_huffman.utils import show_raw_img
 
 logging.basicConfig(level=logging.INFO)
 
-
 def main():
     # for fn in ('tests/images/Lena.raw', 'tests/images/Baboon.raw'):
     for fn in ('tests/images/simple.raw', ):
