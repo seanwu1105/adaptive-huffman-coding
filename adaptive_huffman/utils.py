@@ -32,7 +32,7 @@ def decode_dpcm(seq):
 
 
 def bin_str2bool_list(s):
-    return [False if c == '0' else True for c in s]
+    return [c == '1' for c in s]
 
 
 def bool_list2bin_str(l):
