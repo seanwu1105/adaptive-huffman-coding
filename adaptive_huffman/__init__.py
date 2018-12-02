@@ -1,17 +1,13 @@
-import collections
 import logging
-import math
 import operator
 import os
-import sys
 
 from bitarray import bitarray, bits2bytes
 from progress.bar import ShadyBar
-import numpy as np
 
 from .tree import Tree, NYT, exchange
 from .utils import (encode_dpcm, decode_dpcm, bin_str2bool_list,
-                    bool_list2bin_str, bool_list2int)
+                    bool_list2bin_str, bool_list2int, entropy)
 
 
 class AdaptiveHuffman:
@@ -155,8 +151,9 @@ class AdaptiveHuffman:
         # remaining bits length could be retrieved by reading the first 3 bits.
         # Note that the first 3 bits are stored as big endian binary string.
         remaining_bits_length = bool_list2int(pop_bits(3))
-        del self._bits[-remaining_bits_length:]
-        progressbar.next(remaining_bits_length)
+        if remaining_bits_length:
+            del self._bits[-remaining_bits_length:]
+            progressbar.next(remaining_bits_length)
 
         code = []
         while self._bits:
@@ -228,47 +225,33 @@ class AdaptiveHuffman:
 
 def compress(in_filename, out_filename, alphabet_range, dpcm):
     with open(in_filename, 'rb') as in_file:
-        logging.getLogger(__name__).info('open file: "%s"' % in_filename)
+        logging.getLogger(__name__).info(f'open file: "{in_filename}"')
         content = in_file.read()
-        logging.getLogger(__name__).info('original size: %d bytes' %
-                                         os.path.getsize(in_file.name))
+        logging.getLogger(__name__).info('original size: '
+                                         f'{os.path.getsize(in_file.name)} '
+                                         'bytes')
     ada_huff = AdaptiveHuffman(content, alphabet_range, dpcm)
     code = ada_huff.encode()
 
     with open(out_filename, 'wb') as out_file:
-        logging.getLogger(__name__).info('write file: "%s"' % out_filename)
+        logging.getLogger(__name__).info(f'write file: "{out_filename}"')
         code.tofile(out_file)
-    logging.getLogger(__name__).info('compressed size: %d bytes' %
-                                     os.path.getsize(out_filename))
+    logging.getLogger(__name__).info('compressed size: '
+                                     f'{os.path.getsize(out_filename)} bytes')
 
 
 def extract(in_filename, out_filename, alphabet_range, dpcm):
     with open(in_filename, 'rb') as in_file:
-        logging.getLogger(__name__).info('open file: "%s"' % in_filename)
+        logging.getLogger(__name__).info(f'open file: "{in_filename}"')
         content = in_file.read()
-        logging.getLogger(__name__).info('original size: %d bytes' %
-                                         os.path.getsize(in_file.name))
+        logging.getLogger(__name__).info('original size: '
+                                         f'{os.path.getsize(in_file.name)} '
+                                         'bytes')
     ada_huff = AdaptiveHuffman(content, alphabet_range, dpcm)
     code = ada_huff.decode()
 
     with open(out_filename, 'wb') as out_file:
-        logging.getLogger(__name__).info('write file: "%s"' % out_filename)
+        logging.getLogger(__name__).info(f'write file: "{out_filename}"')
         out_file.write(bytes(code))
-    logging.getLogger(__name__).info('extract size: %d bytes' %
-                                     os.path.getsize(out_filename))
-
-
-def entropy(byte_seq):
-    counter = collections.Counter(byte_seq)
-    ret = 0
-    for count in counter.values():
-        prob = count / sum(counter.values())
-        ret += prob * math.log2(prob)
-    return -ret
-
-
-def int2bytes(x):
-    # NOTE: Do NOT use int.to_byte() directly. Use this function instead.
-    if x == 0:
-        return b'\x00'
-    return x.to_bytes((x.bit_length() + 7) // 8, sys.byteorder)
+    logging.getLogger(__name__).info('extract size: '
+                                     f'{os.path.getsize(out_filename)} bytes')
