@@ -189,7 +189,6 @@ class AdaptiveHuffman:
         progressbar.finish()
         return decode_dpcm(code) if self.dpcm else code
 
-    @profile
     def update(self, data, first_appearance):
 
         def find_node_data(data):
