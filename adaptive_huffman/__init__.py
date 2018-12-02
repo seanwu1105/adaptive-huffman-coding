@@ -21,8 +21,10 @@ class AdaptiveHuffman:
         """
 
         self.byte_seq = byte_seq
-        self._bits = None  # Only used in decode().
         self.dpcm = dpcm
+
+        self._bits = None  # Only used in decode().
+        self._bits_idx = 0  # Only used in decode().
 
         # Get the first decimal number of all alphabets
         self._alphabet_first_num = min(alphabet_range)
@@ -40,7 +42,6 @@ class AdaptiveHuffman:
         self.all_nodes = [self.tree]
         self.nyt = self.tree  # initialize the NYT reference
 
-    @profile
     def encode(self):
         """Encode the target byte sequence into compressed bit sequence by
         adaptive Huffman coding.
@@ -112,7 +113,6 @@ class AdaptiveHuffman:
         progressbar.finish()
         return bitarray(code)
 
-    @profile
     def decode(self):
         """Decode the target byte sequence which is encoded by adaptive Huffman
         coding.
@@ -122,25 +122,36 @@ class AdaptiveHuffman:
                 sequence.
         """
 
-        def pop_bits(n):
+        def read_bits(n):
+            """Read n leftmost bits and move iterator n steps.
+
+            Arguments:
+                n {int} -- The # of bits is about to read.
+
+            Returns:
+                list -- The n bits has been read.
+            """
+
             progressbar.next(n)
-            ret, self._bits = self._bits[:n], self._bits[n:]
+            ret = self._bits[self._bits_idx:self._bits_idx + n]
+            self._bits_idx += n
             return ret
 
         def decode_fixed_code():
-            fixed_code = pop_bits(self.exp)
+            fixed_code = read_bits(self.exp)
             integer = bool_list2int(fixed_code)
             if integer < self.rem:
-                fixed_code.extend(pop_bits(1))
+                fixed_code += read_bits(1)
                 integer = bool_list2int(fixed_code)
             else:
                 integer += self.rem
             return integer + 1 + (self._alphabet_first_num - 1)
 
         # Get boolean list ([True, False, ...]) from bytes.
-        self._bits = bitarray()
-        self._bits.frombytes(self.byte_seq)
-        self._bits = self._bits.tolist()
+        bits = bitarray()
+        bits.frombytes(self.byte_seq)
+        self._bits = bits.tolist()
+        self._bits_idx = 0
 
         progressbar = ShadyBar(
             'decoding',
@@ -152,16 +163,17 @@ class AdaptiveHuffman:
         # bitarray.tofile() to fill up to complete byte size (8 bits). The
         # remaining bits length could be retrieved by reading the first 3 bits.
         # Note that the first 3 bits are stored as big endian binary string.
-        remaining_bits_length = bool_list2int(pop_bits(3))
+        remaining_bits_length = bool_list2int(read_bits(3))
         if remaining_bits_length:
             del self._bits[-remaining_bits_length:]
             progressbar.next(remaining_bits_length)
+        self._bits = tuple(self._bits)
 
         code = []
-        while self._bits:
+        while self._bits_idx < len(self._bits):
             current_node = self.tree  # go to root
             while current_node.left or current_node.right:
-                bit = pop_bits(1)[0]
+                bit = read_bits(1)[0]
                 current_node = current_node.right if bit else current_node.left
             if current_node.data == NYT:
                 first_appearance = True
@@ -177,6 +189,7 @@ class AdaptiveHuffman:
         progressbar.finish()
         return decode_dpcm(code) if self.dpcm else code
 
+    @profile
     def update(self, data, first_appearance):
 
         def find_node_data(data):

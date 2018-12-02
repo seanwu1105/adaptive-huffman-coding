@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO)
 
 def main():
     # for fn in ('tests/images/Lena.raw', 'tests/images/Baboon.raw'):
-    for fn in ('tests/images/simple.raw', ):
+    for fn in ('tests/images/simple.raw',):
         alphabet_range = (0, 255)
         dpcm = False
         compress(fn, 'compressed', alphabet_range=alphabet_range, dpcm=dpcm)

@@ -40,7 +40,7 @@ def bool_list2bin_str(l):
 
 
 def bool_list2int(l):
-    return int(bool_list2bin_str(l), 2)
+    return sum(v << i for i, v in enumerate(reversed(l)))
 
 
 def entropy(byte_seq):
