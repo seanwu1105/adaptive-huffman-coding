@@ -1,7 +1,6 @@
 # Adaptive Huffman Coding Compression
 
-[![pipeline status](https://gitlab.com/seanwu1105/adaptive-huffman-coding/badges/master/pipeline.svg)](https://gitlab.com/seanwu1105/adaptive-huffman-coding/commits/master)
-[![coverage report](https://gitlab.com/seanwu1105/adaptive-huffman-coding/badges/master/coverage.svg)](https://gitlab.com/seanwu1105/adaptive-huffman-coding/commits/master)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/408999c64aea4978b93495391256ede4)](https://www.codacy.com/manual/seanwu1105/adaptive-huffman-coding?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=seanwu1105/adaptive-huffman-coding&amp;utm_campaign=Badge_Grade)
 [![Requirements Status](https://requires.io/github/seanwu1105/adaptive-huffman-coding/requirements.svg?branch=master)](https://requires.io/github/seanwu1105/adaptive-huffman-coding/requirements/?branch=master)
 
 Adaptive Huffman coding algorithm in Python.

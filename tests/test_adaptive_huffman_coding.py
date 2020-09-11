@@ -3,10 +3,13 @@ import os
 import logging
 import unittest
 
-from adaptive_huffman import compress, extract
-
+from adaptive_huffman_coding import __version__, compress, extract
 
 logging.basicConfig(level=logging.DEBUG)
+
+
+def test_version():
+    assert __version__ == '0.1.0'
 
 
 class TestCompressionAndExtraction(unittest.TestCase):
@@ -29,6 +32,6 @@ class TestCompressionAndExtraction(unittest.TestCase):
                 self.assertTrue(os.path.getsize(
                     self.compressed_filename) < os.path.getsize(fn))
             self.assertTrue(filecmp.cmp(fn, self.extracted_filename))
-    
+
     def test_compress_and_extract_dpcm(self):
         self.test_compress_and_extract(dpcm=True)

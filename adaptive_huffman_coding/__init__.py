@@ -9,6 +9,8 @@ from .tree import Tree, NYT, exchange
 from .utils import (encode_dpcm, decode_dpcm, bin_str2bool_list,
                     bool_list2bin_str, bool_list2int, entropy)
 
+__version__ = '0.1.0'
+
 
 class AdaptiveHuffman:
     def __init__(self, byte_seq, alphabet_range=(0, 255), dpcm=False):
@@ -83,9 +85,7 @@ class AdaptiveHuffman:
         if self.dpcm:
             self.byte_seq = tuple(encode_dpcm(self.byte_seq))
 
-        logging.getLogger(__name__).info(
-            'entropy: %f' % entropy(self.byte_seq)
-        )
+        logging.getLogger(__name__).info('entropy: %f', entropy(self.byte_seq))
 
         code = []
         for symbol in self.byte_seq:
@@ -239,33 +239,35 @@ class AdaptiveHuffman:
 
 def compress(in_filename, out_filename, alphabet_range, dpcm):
     with open(in_filename, 'rb') as in_file:
-        logging.getLogger(__name__).info(f'open file: "{in_filename}"')
+        logging.getLogger(__name__).info('open file: "%s"', in_filename)
         content = in_file.read()
-        logging.getLogger(__name__).info('original size: '
-                                         f'{os.path.getsize(in_file.name)} '
-                                         'bytes')
+        logging.getLogger(__name__).info(
+            'original size: %d bytes', os.path.getsize(in_file.name)
+        )
     ada_huff = AdaptiveHuffman(content, alphabet_range, dpcm)
     code = ada_huff.encode()
 
     with open(out_filename, 'wb') as out_file:
-        logging.getLogger(__name__).info(f'write file: "{out_filename}"')
+        logging.getLogger(__name__).info('write file: "%s"', out_filename)
         code.tofile(out_file)
-    logging.getLogger(__name__).info('compressed size: '
-                                     f'{os.path.getsize(out_filename)} bytes')
+    logging.getLogger(__name__).info(
+        'compressed size: %d bytes', os.path.getsize(out_filename)
+    )
 
 
 def extract(in_filename, out_filename, alphabet_range, dpcm):
     with open(in_filename, 'rb') as in_file:
-        logging.getLogger(__name__).info(f'open file: "{in_filename}"')
+        logging.getLogger(__name__).info('open file: "%s"', in_filename)
         content = in_file.read()
-        logging.getLogger(__name__).info('original size: '
-                                         f'{os.path.getsize(in_file.name)} '
-                                         'bytes')
+        logging.getLogger(__name__).info(
+            'original size: %d bytes', os.path.getsize(in_file.name)
+        )
     ada_huff = AdaptiveHuffman(content, alphabet_range, dpcm)
     code = ada_huff.decode()
 
     with open(out_filename, 'wb') as out_file:
-        logging.getLogger(__name__).info(f'write file: "{out_filename}"')
+        logging.getLogger(__name__).info('write file: "%s"', out_filename)
         out_file.write(bytes(code))
-    logging.getLogger(__name__).info('extract size: '
-                                     f'{os.path.getsize(out_filename)} bytes')
+    logging.getLogger(__name__).info(
+        'extract size: %d bytes', os.path.getsize(out_filename)
+    )
