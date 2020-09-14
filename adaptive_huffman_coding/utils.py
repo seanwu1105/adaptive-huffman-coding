@@ -31,16 +31,16 @@ def decode_dpcm(seq):
     return itertools.accumulate(seq, lambda x, y: (x + y) & 0xff)
 
 
-def bin_str2bool_list(s):
-    return [c == '1' for c in s]
+def bin_str2bool_list(binary_string):
+    return [c == '1' for c in binary_string]
 
 
-def bool_list2bin_str(l):
-    return ''.join('1' if i else '0' for i in l)
+def bool_list2bin_str(boolean_list):
+    return ''.join('1' if i else '0' for i in boolean_list)
 
 
-def bool_list2int(l):
-    return sum(v << i for i, v in enumerate(reversed(l)))
+def bool_list2int(boolean_list):
+    return sum(v << i for i, v in enumerate(reversed(boolean_list)))
 
 
 def entropy(byte_seq):

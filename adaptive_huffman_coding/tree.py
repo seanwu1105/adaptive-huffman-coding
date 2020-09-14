@@ -3,6 +3,7 @@ import collections
 NYT = 'NYT'
 
 
+# pylint: disable=too-many-instance-attributes
 class Tree:
     def __init__(self, weight, num, data=None):
         """Use a set (`nodes`) to store all nodes in order to search the same
@@ -16,24 +17,24 @@ class Tree:
         self.parent = None
         self.data = data
         # code will not be always updated
-        self._code = []
+        self.code = []
 
     def __repr__(self):
-        return "#%d(%d)%s '%s'" % (self.num, self.weight, self.data, self._code)
+        return "#%d(%d)%s '%s'" % (self.num, self.weight, self.data, self.code)
 
     @property
     def left(self):
         return self._left
-
-    @property
-    def right(self):
-        return self._right
 
     @left.setter
     def left(self, left):
         self._left = left
         if self._left:
             self._left.parent = self
+
+    @property
+    def right(self):
+        return self._right
 
     @right.setter
     def right(self, right):
@@ -42,15 +43,15 @@ class Tree:
             self._right.parent = self
 
     def pretty(self, indent_str='  '):
-        return ''.join(self._pretty(0, indent_str))
+        return ''.join(self.pretty_impl(0, indent_str))
 
-    def _pretty(self, level, indent_str):
+    def pretty_impl(self, level, indent_str):
         if not self._left and not self._right:
             return [indent_str * level, '%s' % self, '\n']
         line = [indent_str * level, '%s' % self, '\n']
         for subtree in (self._left, self._right):
             if isinstance(subtree, Tree):
-                line += subtree._pretty(level + 1, indent_str)
+                line += subtree.pretty_impl(level + 1, indent_str)
         return line
 
     def search(self, target):
@@ -70,14 +71,14 @@ class Tree:
         while stack:
             current = stack.pop()
             if current.data == target:
-                return {'first_appearance': False, 'code': current._code}
+                return {'first_appearance': False, 'code': current.code}
             if current.data == NYT:
-                nytcode = current._code
+                nytcode = current.code
             if current.right:
-                current.right._code = current._code + [1]
+                current.right.code = current.code + [1]
                 stack.append(current.right)
             if current.left:
-                current.left._code = current._code + [0]
+                current.left.code = current.code + [0]
                 stack.append(current.left)
         return {'first_appearance': True, 'code': nytcode}
 

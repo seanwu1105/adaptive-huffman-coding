@@ -12,6 +12,7 @@ from .utils import (encode_dpcm, decode_dpcm, bin_str2bool_list,
 __version__ = '0.1.0'
 
 
+# pylint: disable=too-many-instance-attributes
 class AdaptiveHuffman:
     def __init__(self, byte_seq, alphabet_range=(0, 255), dpcm=False):
         """Create an adaptive huffman encoder and decoder.
@@ -122,7 +123,7 @@ class AdaptiveHuffman:
                 sequence.
         """
 
-        def read_bits(n):
+        def read_bits(bit_count):
             """Read n leftmost bits and move iterator n steps.
 
             Arguments:
@@ -132,9 +133,9 @@ class AdaptiveHuffman:
                 list -- The n bits has been read.
             """
 
-            progressbar.next(n)
-            ret = self._bits[self._bits_idx:self._bits_idx + n]
-            self._bits_idx += n
+            progressbar.next(bit_count)
+            ret = self._bits[self._bits_idx:self._bits_idx + bit_count]
+            self._bits_idx += bit_count
             return ret
 
         def decode_fixed_code():
@@ -226,8 +227,7 @@ class AdaptiveHuffman:
                     ),
                     key=operator.attrgetter('num')
                 )
-                if (current_node != node_max_num_in_block and
-                        node_max_num_in_block != current_node.parent):
+                if node_max_num_in_block not in (current_node, current_node.parent):
                     exchange(current_node, node_max_num_in_block)
                     current_node = node_max_num_in_block
                 current_node.weight += 1
