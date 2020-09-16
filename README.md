@@ -24,13 +24,13 @@ Adaptive Huffman coding algorithm in Python.
 Clone this repositroy.
 
 ``` bash
-git clone https://github.com/seanwu1105/prototype-jpeg
+git clone https://github.com/seanwu1105/adaptive_huffman_coding
 ```
 
 Open the root directory.
 
 ``` bash
-cd prototype_jpeg
+cd adaptive_huffman_coding
 ```
 
 Install the dependencies with Poetry.
