@@ -3,7 +3,7 @@ name: build
 on: [push, pull_request]
 
 jobs:
-  prototype-jpeg:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
