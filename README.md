@@ -12,7 +12,34 @@ Adaptive Huffman coding algorithm in Python.
 | `Lena.raw` ![Lena.raw Preview ](https://i.imgur.com/gLSTp61.png  "Lena.raw Preview" )       | 245153 Bytes | 02:12s/01:50s               | 7.447359            | 167384 Bytes                | 01:50s/01:11s                      | 5.064970                   |
 | `Baboon.raw` ![Baboon.raw Preview ](https://i.imgur.com/zDWHGXN.png  "Baboon.raw Preview" ) | 242230 Bytes | 02:15s/01:50s               | 7.357734            | 209341 Bytes                | 02:15s/01:47s                      | 6.352999                   |
 
-## Usage and Installation
+## Getting Started
+
+### Environment
+
+* Visual Studio Code
+* Poetry 1.0.10 or later
+
+### Installation
+
+Clone this repositroy.
+
+``` bash
+git clone https://github.com/seanwu1105/prototype-jpeg
+```
+
+Open the root directory.
+
+``` bash
+cd prototype_jpeg
+```
+
+Install the dependencies with Poetry.
+
+``` bash
+poetry install --no-root
+```
+
+### Uses
 
 This project is fully written in Python 3. For data compression given specific alphabet size,
 
@@ -45,41 +72,13 @@ python3 main.py
 Furthermore, for simple testing (whether the file after compression and extraction is the same as the original),
 
 ``` bash
-nose2 -v --with-coverage --log-capture
+pytest
 ```
-
-> This requires **nose2** package (`pip3 install nose2`).
 
 ## Caveat
 
 * This algorithm will read **ALL** image into memory and **ALL** encoded bits would be saved as **Python String**, and thus it is possible to cause memory overflow if the input image file is too large.
 * [Details Report](https://is.gd/VMCLWw)
-
-## Dependencies
-
-* [bitarray](https://github.com/ilanschnell/bitarray)
-
-``` bash
-pip3 install bitarray
-```
-
-* [NumPy](http://www.numpy.org/)
-
-``` bash
-pip3 install numpy
-```
-
-* [Matplotlib](https://matplotlib.org/)
-
-``` bash
-pip3 install matplotlib
-```
-
-* [progress](https://github.com/verigak/progress/)
-
-``` bash
-pip3 install progress
-```
 
 ## Algorithm and Implementation
 
