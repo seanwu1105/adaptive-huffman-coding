@@ -12,7 +12,7 @@ matplotlib = "^3.3.2"
 progress = "^1.5"
 
 [tool.poetry.dev-dependencies]
-pytest = "^6.0"
+pytest = "^6.1"
 pylint = "^2.6.0"
 mypy = "^0.782"
 autopep8 = "^1.5.4"
