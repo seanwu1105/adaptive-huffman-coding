@@ -8,7 +8,7 @@ authors = ["Sean Wu <seanwu1105@gmail.com>"]
 python = "^3.8"
 bitarray = "^1.6.0"
 numpy = "^1.19.2"
-matplotlib = "^3.3.2"
+matplotlib = "^3.3.4"
 progress = "^1.5"
 
 [tool.poetry.dev-dependencies]
