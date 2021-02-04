@@ -15,7 +15,7 @@ progress = "^1.5"
 pytest = "^6.1"
 pylint = "^2.6.0"
 mypy = "^0.790"
-autopep8 = "^1.5.4"
+autopep8 = "^1.5.5"
 pytest-cov = "^2.10.1"
 
 [build-system]
